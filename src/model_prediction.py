@@ -8,50 +8,20 @@ import matplotlib.pyplot as plt
 
 # Data Preprocessing Function
 def preprocess_data():
-    employee_data = pd.read_csv(r'C:\Users\admin\OneDrive\Desktop\MIS581 Port folio Data Sets\employee_data.csv')
-    engagement_data = pd.read_csv(r'C:\Users\admin\OneDrive\Desktop\MIS581 Port folio Data Sets\employee_engagement_survey_data.csv')
-    recruitment_data = pd.read_csv(r'C:\Users\admin\OneDrive\Desktop\MIS581 Port folio Data Sets\recruitment_data.csv')
-    training_data = pd.read_csv(r'C:\Users\admin\OneDrive\Desktop\MIS581 Port folio Data Sets\training_and_development_data.csv')
-
-    # Print the columns of each DataFrame to debug
-    print("Employee Data Columns:", employee_data.columns)
-    print(employee_data.head())
-    print("Engagement Data Columns:", engagement_data.columns)
-    print(engagement_data.head())
-    print("Recruitment Data Columns:", recruitment_data.columns)
-    print(recruitment_data.head())
-    print("Training Data Columns:", training_data.columns)
-    print(training_data.head())
-
-    # Merging Data Sets
-    merged_data = pd.merge(employee_data, engagement_data, on='employee_id', how='inner')
-    merged_data = pd.merge(merged_data, recruitment_data, on='employee_id', how='inner')
-    merged_data = pd.merge(merged_data, training_data, on='employee_id', how='inner')
-
-    # Missing Values
-    merged_data.dropna(inplace=True)
-
-    # Categorical Values (Encode)
-    merged_data = pd.get_dummies(merged_data)
-
-    # Ensure the directory exists
-    output_dir = '../data'
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    # Save Data
-    merged_data.to_csv(os.path.join(output_dir, 'preprocessed_data.csv'), index=False)
-
-    return merged_data
+    preprocessed_data_path = r'data/preprocessed_data.csv'
+    if not os.path.exists(preprocessed_data_path):
+        raise FileNotFoundError(f"Preprocessed data file not found at {preprocessed_data_path}")
+    
+    data = pd.read_csv(preprocessed_data_path)
+    return data
 
 # Model Prediction Function
 def predict_model():
-    # Preprocess the data
     data = preprocess_data()
     
     # Features and target variable
-    X = data.drop(columns=['leadership_potential'])  # Assuming 'leadership_potential' is the target variable
-    y = data['leadership_potential']
+    X = data.drop(columns=['Current Employee Rating'])  # Assuming 'Current Employee Rating' is the target variable
+    y = data['Current Employee Rating']
 
     # Train-test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -62,7 +32,7 @@ def predict_model():
     X_test = scaler.transform(X_test)
 
     # Load the model
-    model_path = '../models/leadership_model.pkl'
+    model_path = 'models/leadership_model.pkl'
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file not found at {model_path}")
 
